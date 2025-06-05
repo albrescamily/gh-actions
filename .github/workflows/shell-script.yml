@@ -3,7 +3,7 @@ name: Run a shell script
 on:
   workflow_dispatch:
     inputs:
-        NameVariable: 
+        NameVariable: #input do workflow
           description: "Enter your name"
           required: true
           type: string
@@ -12,15 +12,15 @@ jobs:
   first-job:
     runs-on: ubuntu-latest
     outputs:
-        output1: $ {{steps.set_output.outputs.NameVariable}}
+        output1: $ {{steps.set_output.outputs.name_variable}} #output de saida do job
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: First job shell command
         id: set_output
-        run: echo "Hello, ${{ github.event.inputs.NameVariable }}" >> $GITHUB_OUTPUT
-    
+        run: echo "name_variable=Hello, ${{ github.event.inputs.NameVariable }}" >> $GITHUB_OUTPUT
+        #output de saida do step
 
   second-job:
     runs-on: ubuntu-latest
@@ -34,7 +34,7 @@ jobs:
         run: echo "Hello, second"
 
       - name: Receive output
-        run: echo "${{ needs.first-job.outputs.output1 }}"
+        run: echo "${{ needs.first-job.outputs.output1 }}" #recebe a saida do job 1
 
   third-job:
     runs-on: ubuntu-latest
