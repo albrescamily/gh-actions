@@ -12,14 +12,14 @@ jobs:
   first-job:
     runs-on: ubuntu-latest
     outputs:
-        output1: $ {{steps.set_output.outputs.name_variable}} #output de saida do job
+        output1: ${{ steps.set_output.outputs.name_variable }} #output de saida do job
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: First job shell command
         id: set_output
-        run: echo "name_variable=Hello, ${{ github.event.inputs.NameVariable }}" >> $GITHUB_OUTPUT
+        run: echo "name_variable=Hello, ${{ inputs.NameVariable }}" >> $GITHUB_OUTPUT
         #output de saida do step
 
   second-job:
