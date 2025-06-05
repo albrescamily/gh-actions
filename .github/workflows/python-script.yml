@@ -1,9 +1,9 @@
-name: Run Python Script
+name: Run a Python Script
 
 on:
   push:
     branches:
-      - main
+      - main #
   workflow_dispatch:
 
 jobs:
@@ -38,7 +38,6 @@ jobs:
   confirmation:
     runs-on: ubuntu-latest
     needs: execute-script
-
     steps:
       - name: Confirmation
         run: echo "Cowsay said!"

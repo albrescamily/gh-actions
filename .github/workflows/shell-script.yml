@@ -11,13 +11,16 @@ on:
 jobs:
   first-job:
     runs-on: ubuntu-latest
-
+    outputs:
+        output1: $ {{steps.set_output.outputs.NameVariable}}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: First job shell command
-        run: echo "Hello, ${{ github.event.inputs.NameVariable }}"
+        id: set_output
+        run: echo "Hello, ${{ github.event.inputs.NameVariable }}" >> $GITHUB_OUTPUT
+    
 
   second-job:
     runs-on: ubuntu-latest
@@ -29,6 +32,9 @@ jobs:
 
       - name: Second job shell command
         run: echo "Hello, second"
+
+      - name: Receive output
+        run: echo "${{ needs.first-job.outputs.output1 }}"
 
   third-job:
     runs-on: ubuntu-latest
