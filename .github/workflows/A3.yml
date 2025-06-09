@@ -1,5 +1,4 @@
-name: Run a Python Script
-
+name: A3
 on:
   push:
     branches:

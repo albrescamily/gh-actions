@@ -1,4 +1,4 @@
-name: Run a shell script
+name: A1
 
 on:
   workflow_dispatch:
