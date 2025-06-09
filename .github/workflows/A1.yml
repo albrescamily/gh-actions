@@ -1,0 +1,41 @@
+name: Run a shell script
+
+on:
+  workflow_dispatch:
+    inputs:
+        custom_message: #workflow input 
+          description: "Enter your message"
+          required: true
+          type: string
+
+jobs:
+  first-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: First job shell command 
+        run: echo "Hello, first"
+
+        
+  second-job:
+    runs-on: ubuntu-latest
+    needs: first-job
+    if: ${{ always() }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Second job shell command
+        run: echo "Hello, second"
+
+  third-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Shell command
+        run: echo "Hello, third"

@@ -36,7 +36,6 @@ jobs:
       - name: Run Python script
         run: python .github/scripts/script.py
 
-
   confirmation:
     runs-on: ubuntu-latest
     needs: execute-script

@@ -1,0 +1,119 @@
+name: A2
+
+on:
+  workflow_dispatch:
+    inputs:
+      custom_message: # Workflow input (context)
+        description: "Enter your message"
+        required: true
+      iterations: # Workflow input (context)
+        description: "Number of iterations for a loop (int)"
+        required: false
+        type: number
+        default: 3
+
+env:
+  # 1. Global Environment Variable
+  GLOBAL_ENV_VAR: "I am a global variable accessible everywhere!"
+
+jobs:
+  first-job:
+    runs-on: ubuntu-latest
+    env: 
+        JOB_ENV_VAR: "This is a Job level variable" 
+    
+    outputs:
+      # 3. Job Output (from step output)
+      job_message_output: ${{ steps.process_data.outputs.processed_message }}
+      job_iteration_count: ${{ steps.process_data.outputs.iteration_count }}
+
+  
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Display JOB_ENV_VAR
+        run: echo ${{ env.JOB_ENV_VAR }}
+
+      - name: Display Initial Contexts and Global Env Var
+        run: |
+          echo "--- Initial Contexts & Global Env Var ---"
+          echo "Global Env Var: ${{ env.GLOBAL_ENV_VAR }}"
+          echo "Repository Name (github context): ${{ github.repository }}"
+          echo "Workflow Run ID (github context): ${{ github.run_id }}"
+          echo "Custom Message Input (workflow input context): ${{ github.event.inputs.custom_message }}"
+          echo "Iterations Input (workflow input context): ${{ github.event.inputs.iterations }}"
+          echo "-----------------------------------------"
+        env:
+          # 1. Step-Specific Environment Variable
+          STEP_ENV_VAR_1: "This is specific to 'Display Initial Contexts' step."
+
+      - name: Process Data and Set Step/Job Outputs
+        id: process_data # ID for referencing step outputs
+        env:
+          # 1. Step-Specific Environment Variable
+          STEP_ENV_VAR_2: "This one is specific to 'Process Data' step."
+        run: |
+          echo "--- Processing Data ---"
+          echo "Accessing Global Env Var in this step: ${{ env.GLOBAL_ENV_VAR }}"
+          echo "Accessing Step-Specific Env Var: ${{ env.STEP_ENV_VAR_2 }}"
+
+          # 2. Accessing Contexts (e.g., workflow inputs)
+          INPUT_MESSAGE="${{ github.event.inputs.custom_message }}"
+          ITERATIONS_COUNT="${{ github.event.inputs.iterations }}"
+          
+          PROCESSED_MSG="Processed: '$INPUT_MESSAGE' - Run by ${{ github.actor }}"
+          echo "Processed Message: $PROCESSED_MSG"
+          echo "Iteration Count: $ITERATIONS_COUNT"
+          
+          # 3. Setting Step Outputs (will be used for Job Outputs)
+          echo "processed_message=$PROCESSED_MSG" >> "$GITHUB_OUTPUT"
+          echo "iteration_count=$ITERATIONS_COUNT" >> "$GITHUB_OUTPUT"
+          echo "-----------------------"
+
+  second-job:
+    runs-on: ubuntu-latest
+    needs: first-job # Depends on first-job to receive its outputs
+    if: success()
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Consume Outputs from First Job and Global Env Var
+        run: |
+          echo "--- Second Job: Consuming Outputs ---"
+          # 1. Accessing Global Environment Variable
+          echo "Global Env Var in Second Job: ${{ env.GLOBAL_ENV_VAR }}"
+
+          # 3. Accessing Job Outputs from 'first-job'
+          RECEIVED_MESSAGE="${{ needs.first-job.outputs.job_message_output }}"
+          RECEIVED_ITERATIONS="${{ needs.first-job.outputs.job_iteration_count }}"
+
+          echo "Received Message from First Job: $RECEIVED_MESSAGE"
+          echo "Received Iterations from First Job: $RECEIVED_ITERATIONS"
+          echo "-------------------------------------"
+
+      - name: Loop based on received iteration count
+        run: |
+          ITERATIONS="${{ needs.first-job.outputs.job_iteration_count }}"
+          echo "Starting loop for $ITERATIONS iterations..."
+          for i in $(seq 1 $ITERATIONS); do
+            echo "Loop iteration $i"
+          done
+          echo "Loop finished."
+
+  third-job-independent:
+    runs-on: ubuntu-latest
+    # This job runs independently of others
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Demonstrate Global Env Var and Basic Context
+        run: |
+          echo "--- Third Job: Independent ---"
+          echo "Global Env Var: ${{ env.GLOBAL_ENV_VAR }}"
+          echo "Current Branch (github context): ${{ github.ref_name }}"
+          echo "----------------------------"
