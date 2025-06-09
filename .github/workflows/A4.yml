@@ -1,0 +1,69 @@
+name: Run a Python Script
+
+on:
+  workflow_dispatch:
+
+jobs:
+  
+  build-environment:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Create virtual environment 
+        run: python -m venv .venv
+      - name: Active virtual environment and install dependencies 
+        run: |
+          source .venv/bin/activate
+          pip install cowsay         
+
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install cowsay
+
+      - name: Package environment 
+        run: tar -czf environment.tar.gz
+     
+      - name: Upload environment artifact 
+        uses: actions/upload-artifact@v4
+        with:
+            name: python-environment
+            path: environment.tar.gz
+            retention-days: 1 
+
+  use-environment: 
+    runs-on: ubuntu-latest
+    needs: build-environment 
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download environment artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: python-environment
+          path: .
+
+      - name: Extract environment
+        run: tar -xzf environment.tar.gz
+
+      - name: Run Python script
+        run: python .github/scripts/script.py
+
+
+  confirmation:
+    runs-on: ubuntu-latest
+    needs: use-environment
+    steps:
+      - name: Confirmation
+        run: echo "Cowsay said!"
