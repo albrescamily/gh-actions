@@ -23,7 +23,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip # Path to the pip cache directory
-          key: ${{ runner.os }}-python-${{ hashFiles('**/requirements.txt') }} # A unique key for the cache
+          key: ${{ runner.os }}-python-${{ hashFiles('**/scripts/requirements.txt') }} # A unique key for the cache
           restore-keys: |
             ${{ runner.os }}-python- # Fallback key
 
