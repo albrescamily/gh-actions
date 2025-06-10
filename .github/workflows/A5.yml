@@ -5,6 +5,8 @@ on:
     branches:
         main
     types: [opened, synchronize, reopened] # Triggers the workflow when a PR is opened, synchronized, or reopened
+  workflow_dispatch:
+
 
 env: # Defines global environment variables for the workflow (optional)
   GLOBAL_VARIABLE: "This is a global workflow variable"
