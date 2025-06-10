@@ -27,17 +27,3 @@ jobs:
         echo "Environment secret (ENV_SECRET): ${{ secrets.ENV_SECRET }}"
         echo "Global workflow variable: ${{ env.GLOBAL_VARIABLE }}"
         echo "GitHub context variable (GITHUB_REF_NAME): ${{ github.ref_name }}"
-        echo "GitHub context variable (GITHUB_HEAD_REF): ${{ github.head_ref }}"
-
-    - name: Example of using variables in a command
-      run: |
-        echo "Running a command using the variable: build --env=${{ vars.ENV_VARIABLE }}"
-        # In this example, you'd replace this with a real command from your project.
-        # For example: npm run build --env=${{ vars.ENV_VARIABLE }}
-
-    - name: Example of using secrets in a command (use with caution!)
-      run: |
-        echo "Running a command using the secret (NOT RECOMMENDED FOR LOG OUTPUT!): deploy --token=${{ secrets.ENV_SECRET }}"
-        # CAUTION: Never print secrets to production logs.
-        # This is just an example to demonstrate access.
-        # In a real scenario, the secret would be passed to a tool or script securely.
