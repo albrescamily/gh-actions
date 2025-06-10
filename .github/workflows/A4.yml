@@ -1,4 +1,4 @@
-name: Run a Python Script
+name: A4
 
 on:
   workflow_dispatch:
@@ -24,20 +24,14 @@ jobs:
           source .venv/bin/activate
           pip install cowsay         
 
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install cowsay
-
       - name: Package environment 
-        run: tar -czf environment.tar.gz
+        run: tar -czf environment.tar.gz .venv
      
       - name: Upload environment artifact 
         uses: actions/upload-artifact@v4
         with:
             name: python-environment
-            path: environment.tar.gz
+            path: environment.tar.gz 
             retention-days: 1 
 
   use-environment: 
@@ -58,7 +52,9 @@ jobs:
         run: tar -xzf environment.tar.gz
 
       - name: Run Python script
-        run: python .github/scripts/script.py
+        run: |
+          source .venv/bin/activate
+          python .github/scripts/script.py
 
 
   confirmation:
