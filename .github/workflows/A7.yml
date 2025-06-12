@@ -92,7 +92,7 @@ jobs:
 
       - name: Writing in the cow script
         run:
-          echo "${{ needs.second-job.outputs.second_job_output }}" > .github/cow.txt
+          echo "${{ needs.second-job.outputs.second_job_output }}" >> .github/cow.txt
 
       - name: Upload cow.txt as artifact
         uses: actions/upload-artifact@v4
