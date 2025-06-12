@@ -68,10 +68,10 @@ jobs:
       - name: Step 2 - Message Received
         run: |
           echo "Job condition accepted -> ${{ github.event.inputs.signal_start }}"
-
+      
       - name: Step 3 - Changing my message
         id: step3_output_id
-        run: echo "changed_message= \n Cowsay said ${{ github.event.inputs.inserted_message }}" >> $GITHUB_OUTPUT
+        run: echo "changed_message= Cowsay said ${{ github.event.inputs.inserted_message }}" >> $GITHUB_OUTPUT
         
       - name: Step 4 - Setting Job Output
         id: step4_job_output_id
