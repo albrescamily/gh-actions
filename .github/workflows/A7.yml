@@ -55,22 +55,11 @@ jobs:
           echo "Github_ENV: $GITHUB_ENV"
           echo "Runner OS: $RUNNER_OS"
 
-      - name: Set value to environment variable using GITHUB_ENV
-        run:
-          echo "DYNAMIC_VAR=Hello, there!" >> $GITHUB_ENV #just exists inside the job it was created
-      
-      - name: Show value of GITHUB_ENV
-        run: |
-         echo "$GITHUB_ENV"
-         echo "$DYNAMIC_VAR"
-
- 
 
   second-job:
     runs-on: ubuntu-latest
     outputs:
       second_job_output: ${{ steps.step4_job_output_id.outputs.output_message }}
-    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.signal_start == true }}
     steps:
       - name: Step 1 - Checkout Repository
         uses: actions/checkout@v4
