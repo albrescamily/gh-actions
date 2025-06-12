@@ -75,8 +75,8 @@ jobs:
       - name: Step 4 - Setting Job Output
         id: step4_job_output_id
         run: |
-          echo "Setting message received from Step 3 as Job Output: ${{ steps.step3_output_id.outputs.changed_message }}"
-#echo "output_message=${{ steps.step3_output_id.outputs.changed_message }}"
+          echo "Setting message received from Step 3 as Job Output"
+          echo "output_message=${{ steps.step3_output_id.outputs.changed_message }}" >> $GITHUB_OUTPUT
 
      
 
