@@ -1,0 +1,132 @@
+name: A7
+
+on:
+
+  pull_request:
+    branches: main
+
+  workflow_dispatch:
+    inputs:
+      inserted_message:
+        description: "Enter your message"
+        required: false
+        type: string
+        default: Mooo
+
+      signal_start:
+        description: "Run conditional jobs?"
+        required: true
+        type: boolean
+
+env:
+  GLOBAL_ENV_VAR: "This is a workflow-level variable"
+
+jobs:
+  first-job:
+    runs-on: ubuntu-latest
+    env:
+      JOB_ENV_VAR: "This is a job-level variable"
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Display custom environments variables
+        run: |
+          echo "Using context syntax:"
+          echo "${{ env.GLOBAL_ENV_VAR }}"
+          echo "${{ env.JOB_ENV_VAR }}"
+          echo "${{ env.STEP_ENV_VAR }}"
+          echo "Using shell variable syntax:"
+          echo "Global: $GLOBAL_ENV_VAR"
+          echo "Job: $JOB_ENV_VAR"
+          echo "Step: $STEP_ENV_VAR"
+
+        env: #the context will be interpolated and replace by a string BEFORE the job is sent to a runner
+          STEP_ENV_VAR: "This is a step-level variable"
+
+      - name: Display default variables
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Event Name: ${{ github.event_name }}"
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Github_ENV: $GITHUB_ENV"
+          echo "Runner OS: $RUNNER_OS"
+
+      - name: Set value to environment variable using GITHUB_ENV
+        run:
+          echo "DYNAMIC_VAR=Hello, there!" >> $GITHUB_ENV #just exists inside the job it was created
+      
+      - name: Show value of GITHUB_ENV
+        run: |
+         echo "$GITHUB_ENV"
+         echo "$DYNAMIC_VAR"
+
+ 
+
+  second-job:
+    runs-on: ubuntu-latest
+    outputs:
+      second_job_output: ${{ steps.step4_job_output_id.outputs.output_message }}
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.signal_start == true }}
+    steps:
+      - name: Step 1 - Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Step 2 - Message Received
+        run: |
+          echo "Job condition accepted -> ${{ github.event.inputs.signal_start }}"
+
+      - name: Step 3 - Changing my message
+        id: step3_output_id
+        run: echo "changed_message=Cowsay said ${{ github.event.inputs.inserted_message }}" >> $GITHUB_OUTPUT
+        
+      - name: Step 4 - Setting Job Output
+        id: step4_job_output_id
+        run: |
+          echo "Setting message received from Step 3 as Job Output: ${{ steps.step3_output_id.outputs.changed_message }}"
+#echo "output_message=${{ steps.step3_output_id.outputs.changed_message }}"
+
+     
+
+  third-job:
+    runs-on: ubuntu-latest
+    needs: second-job
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Receiving Previous Job Output
+        run: echo "${{ needs.second-job.outputs.second_job_output }}"
+
+      - name: Writing in the cow script
+        run:
+          echo "${{ needs.second-job.outputs.second_job_output }}" > ./github/cow.txt
+
+      - name: Upload cow.txt as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cow-message
+          path: ./github/cow.txt
+
+ 
+
+  forth-job:
+
+    runs-on: ubuntu-latest
+
+    needs: third-job
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download cow-message artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: cow-message
+          path: ./downloaded
+
+      - name: Show downloaded file content
+        run: cat ./downloaded/cow.txt
