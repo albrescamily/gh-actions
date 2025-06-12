@@ -14,7 +14,7 @@ on:
         default: Mooo
 
       signal_start:
-        description: "Run conditional jobs?"
+        description: "Should start"
         required: true
         type: boolean
         default: true
@@ -60,6 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       second_job_output: ${{ steps.step4_job_output_id.outputs.output_message }}
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.signal_start == 'true' }}
     steps:
       - name: Step 1 - Checkout Repository
         uses: actions/checkout@v4
