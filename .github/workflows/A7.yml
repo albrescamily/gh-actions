@@ -17,6 +17,7 @@ on:
         description: "Run conditional jobs?"
         required: true
         type: boolean
+        default: true
 
 env:
   GLOBAL_ENV_VAR: "This is a workflow-level variable"
