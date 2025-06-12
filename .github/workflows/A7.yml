@@ -14,7 +14,7 @@ on:
         default: Mooo
 
       signal_start:
-        description: "Should start"
+        description: "Should start?"
         required: true
         type: boolean
         default: true
