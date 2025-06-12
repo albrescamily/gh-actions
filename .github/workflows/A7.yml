@@ -88,17 +88,17 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Receiving Previous Job Output
-        run: echo "${{ needs.second-job.outputs.second_job_output }}"
+        run: echo " Message received ${{ needs.second-job.outputs.second_job_output }}"
 
       - name: Writing in the cow script
         run:
-          echo "${{ needs.second-job.outputs.second_job_output }}" > ./github/cow.txt
+          echo "${{ needs.second-job.outputs.second_job_output }}" > .github/cow.txt
 
       - name: Upload cow.txt as artifact
         uses: actions/upload-artifact@v4
         with:
           name: cow-message
-          path: ./github/cow.txt
+          path: .github/cow.txt
 
  
 
